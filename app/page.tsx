@@ -1,8 +1,9 @@
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Film, Lock, Mail } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -23,12 +24,7 @@ export default function Home() {
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <header className="container mx-auto py-6">
-          <div className="flex items-center">
-            <Film className="h-8 w-8 text-primary mr-2" />
-            <span className="text-2xl font-bold">CineVerse</span>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Main content */}
         <main className="flex-1 flex items-center justify-center px-4 py-12">
