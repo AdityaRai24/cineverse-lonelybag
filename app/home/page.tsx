@@ -1,13 +1,12 @@
 import Image from "next/image";
-import Link from "next/link";
-import { Play, Film } from "lucide-react";
+import { Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SliderSections from "@/components/SliderSections";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen relative overflow-hidden">
-      {/* Background with overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 max-h-screen z-0">
         <Image
           src="https://image.tmdb.org/t/p/original/a4H5TFw7p7hCzED5zKuNzjBbi5h.jpg"
           alt="Background"
@@ -15,7 +14,10 @@ export default function HomePage() {
           className="object-cover brightness-50"
           priority
         />
+        {/* Left gradient fade */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
+        {/* Bottom fade to red */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-red-600/30 to-transparent z-10"></div>
       </div>
 
       {/* Navbar integrated into main content */}
@@ -69,6 +71,11 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <SliderSections title={"Trending Now"} />
+        <SliderSections title={"Latest Content"} />
       </div>
     </main>
   );
