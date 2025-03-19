@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 
-const SliderSections = ({ title }: { title: string }) => {
+const SliderSections = ({ title, movies }: { title: string; movies?: any }) => {
   const sliderRef = useRef<HTMLDivElement>(null);
 
   const scrollAmount = 300; // Adjust based on item width
@@ -24,9 +24,15 @@ const SliderSections = ({ title }: { title: string }) => {
     <section className="relative z-20">
       <div className="mx-auto max-w-[90%]">
         {/* Title Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white">{title}</h2>
-          <div className="h-1 w-24 bg-red-600 mt-2"></div>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-white">{title}</h2>
+            <div className="h-1 w-24 bg-red-600 mt-2"></div>
+          </div>
+          <div>
+            {" "}
+            <Button className="bg-transparent border border-white text-white hover:bg-transparent hover:text-white">View All</Button>{" "}
+          </div>
         </div>
 
         {/* Slider */}
@@ -35,26 +41,27 @@ const SliderSections = ({ title }: { title: string }) => {
             ref={sliderRef}
             className="flex overflow-x-auto space-x-8 pb-8 scrollbar-hide snap-x scroll-smooth"
           >
-            {[...Array(8)].map((_, index) => (
+            {movies?.map((item: any, index: any) => (
               <div key={index} className="flex-none w-[280px] snap-start">
-                <div className="bg-gray-900 group rounded-lg overflow-hidden transition-transform duration-300 cursor-pointer shadow-lg hover:shadow-red-600/20">
+                <div className="bg-gray-900 group rounded-lg overflow-hidden transition-transform duration-300 cursor-pointer shadow-lg hover:border-gray-600 border-2 border-transparent">
                   {/* Image */}
                   <div className="relative h-[330px]">
                     <Image
-                      src="https://image.tmdb.org/t/p/original/a4H5TFw7p7hCzED5zKuNzjBbi5h.jpg"
+                      src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
                       alt="Movie poster"
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold rounded-full w-8 h-8 flex items-center justify-center">
-                      {(Math.random() * 2 + 7).toFixed(1)}
+                      {item.vote_average.toFixed(1)}
                     </div>
                   </div>
 
                   {/* Movie Details */}
                   <div className="p-4">
                     <h3 className="text-white font-semibold truncate">
-                      Deathstroke: Knights & Dragons
+                      {item.title}
                     </h3>
                     <p className="text-gray-400 text-sm mt-1">
                       Action, Adventure

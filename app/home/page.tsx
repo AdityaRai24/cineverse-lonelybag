@@ -1,13 +1,71 @@
+"use client";
 import Image from "next/image";
 import { Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SliderSections from "@/components/SliderSections";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Navbar from "@/components/Navbar";
 
 export default function HomePage() {
+  const [popularMovies, setPopularMovies] = useState([]);
+  const [topRatedMovies, setTopRatedMovies] = useState([]);
+
+  useEffect(() => {
+    fetchPopularMovies();
+    fetchTopRatedMovies();
+  }, []);
+
+  const fetchTopRatedMovies = async () => {
+    const url =
+      "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
+
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGVhOWZiYzA1MjBmYTE2YmU5ZDM4YmNhMDU1YThhZCIsIm5iZiI6MTc0MjE0ODUxOC44MDA5OTk5LCJzdWIiOiI2N2Q3MTNhNmQ4MDIzMDk3MDNmMTViY2MiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.o0flCxvN9s8oBKVGwtl8-OsHBVxrwJ9EQ5LtIpPrbQU",
+      },
+    };
+
+    try {
+      const response = await axios.get(url, options);
+      setTopRatedMovies(response.data.results);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    }
+  };
+
+  const fetchPopularMovies = async () => {
+    const url =
+      "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1";
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGVhOWZiYzA1MjBmYTE2YmU5ZDM4YmNhMDU1YThhZCIsIm5iZiI6MTc0MjE0ODUxOC44MDA5OTk5LCJzdWIiOiI2N2Q3MTNhNmQ4MDIzMDk3MDNmMTViY2MiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.o0flCxvN9s8oBKVGwtl8-OsHBVxrwJ9EQ5LtIpPrbQU",
+      },
+    };
+
+    try {
+      const response = await axios.get(url, options);
+      console.log(response.data);
+      setPopularMovies(response.data.results);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    }
+  };
+
+  console.log(popularMovies);
   return (
     <main className="min-h-screen relative overflow-hidden">
       <div className="absolute inset-0 max-h-screen z-0">
         <Image
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           src="https://image.tmdb.org/t/p/original/a4H5TFw7p7hCzED5zKuNzjBbi5h.jpg"
           alt="Background"
           fill
@@ -17,17 +75,12 @@ export default function HomePage() {
         {/* Left gradient fade */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
         {/* Bottom fade to red */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-red-600/30 to-transparent z-10"></div>
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-red-600/20 to-transparent z-10"></div>
       </div>
 
       {/* Navbar integrated into main content */}
       <div className="relative z-20 max-w-[80%] container mx-auto px-4">
-        <header className="py-6">
-          <div className="flex items-center">
-            <Film className="h-8 w-8 text-primary mr-2" />
-            <span className="text-2xl font-bold text-white">CineVerse</span>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Hero Content */}
         <div className="pt-12 pb-16 h-[calc(100vh-88px)] flex flex-col justify-center">
@@ -64,6 +117,7 @@ export default function HomePage() {
                 <Image
                   src="https://image.tmdb.org/t/p/original/a4H5TFw7p7hCzED5zKuNzjBbi5h.jpg"
                   alt="Deathstroke: Knights & Dragons"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   fill
                   className="object-cover"
                 />
@@ -74,8 +128,8 @@ export default function HomePage() {
       </div>
 
       <div className="mt-8">
-        <SliderSections title={"Trending Now"} />
-        <SliderSections title={"Latest Content"} />
+        <SliderSections movies={popularMovies} title={"Popular"} />
+        <SliderSections movies={topRatedMovies} title={"Top Rated"} />
       </div>
     </main>
   );
