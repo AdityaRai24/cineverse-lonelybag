@@ -1,4 +1,5 @@
 "use client";
+import Footer from "@/components/Footer";
 import MovieCard from "@/components/MovieCard";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
@@ -161,7 +162,7 @@ const Page = () => {
   };
 
   return (
-    <div className="relative min-h-screen pb-20">
+    <div className="relative min-h-screen">
       <div
         className="fixed inset-0 bg-cover bg-center z-0 opacity-10"
         style={{
@@ -171,87 +172,90 @@ const Page = () => {
         }}
       />
 
-      <div className="relative z-20 max-w-[90%] container mx-auto px-4">
-        <Navbar />
+      <div className="relative z-20">
+        <div className="relative z-20 mb-16 max-w-[90%] container mx-auto px-4">
+          <Navbar />
 
-        <div className="flex items-center justify-between mt-8 mb-8">
-          <h2 className="text-4xl font-bold text-white">
-            Results For :{" "}
-            <span className="text-red-500 underline-offset-8 underline capitalize tracking-wide">
-              {formattedCategory ? formattedCategory : searchValue}
-            </span>{" "}
-          </h2>
-          {!loading && (
-            <div className="text-gray-400">
-              Page {currentPage} of {totalPages}
+          <div className="flex items-center justify-between mt-8 mb-8">
+            <h2 className="text-4xl font-bold text-white">
+              Results For :{" "}
+              <span className="text-red-500 underline-offset-8 underline capitalize tracking-wide">
+                {formattedCategory ? formattedCategory : searchValue}
+              </span>{" "}
+            </h2>
+            {!loading && (
+              <div className="text-gray-400">
+                Page {currentPage} of {totalPages}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {loading
+              ? renderSkeletons()
+              : movies?.map((item, index) => (
+                  <MovieCard item={item} index={index} key={item.id} />
+                ))}
+          </div>
+
+          {!loading && totalPages > 0 && (
+            <div className="flex justify-center mt-12">
+              <div className="flex items-center space-x-2 flex-wrap">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center space-x-1">
+                  {getPageNumbers().map((pageNumber, index) => {
+                    if (pageNumber === "...") {
+                      return (
+                        <span
+                          key={`ellipsis-${index}`}
+                          className="w-10 h-10 flex items-center justify-center text-gray-400"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={`page-${pageNumber}`}
+                        onClick={() => handlePageChange(pageNumber as number)}
+                        className={`w-10 h-10 flex items-center justify-center rounded-md ${
+                          currentPage === pageNumber
+                            ? "bg-red-500 text-white"
+                            : "bg-gray-800 text-white hover:bg-gray-700"
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {loading
-            ? renderSkeletons()
-            : movies?.map((item, index) => (
-                <MovieCard item={item} index={index} key={item.id} />
-              ))}
-        </div>
-
-        {!loading && totalPages > 0 && (
-          <div className="flex justify-center mt-12">
-            <div className="flex items-center space-x-2 flex-wrap">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-
-              <div className="flex items-center space-x-1">
-                {getPageNumbers().map((pageNumber, index) => {
-                  if (pageNumber === "...") {
-                    return (
-                      <span
-                        key={`ellipsis-${index}`}
-                        className="w-10 h-10 flex items-center justify-center text-gray-400"
-                      >
-                        ...
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={`page-${pageNumber}`}
-                      onClick={() => handlePageChange(pageNumber as number)}
-                      className={`w-10 h-10 flex items-center justify-center rounded-md ${
-                        currentPage === pageNumber
-                          ? "bg-red-500 text-white"
-                          : "bg-gray-800 text-white hover:bg-gray-700"
-                      }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+        <Footer />
       </div>
     </div>
   );
 };
 
-// Wrap the Page component in a Suspense boundary
 const PageWrapper = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>

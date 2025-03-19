@@ -6,6 +6,7 @@ import SliderSections from "@/components/SliderSections";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 interface Movie {
   id: number;
@@ -130,117 +131,121 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen relative overflow-hidden">
-      <div className="absolute inset-0 max-h-screen z-0">
-        {/* Banner Image or Skeleton */}
+      {/* Full-screen banner background */}
+      <div className="fixed inset-0 -z-10">
         {!bannerLoading && featuredMovie?.backdrop_path ? (
           <Image
             sizes="100vw"
             src={`https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path}`}
             alt={featuredMovie.title || "Featured Movie"}
             fill
-            className="object-cover brightness-50 transition-opacity duration-300 opacity-100"
+            className="object-cover object-center brightness-100 transition-opacity duration-300 opacity-100"
             priority
             onLoad={() => setBannerLoading(false)}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 animate-pulse"></div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-red-500/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent"></div>
       </div>
 
-      <div className="relative z-20 max-w-[90%] container mx-auto px-4">
-        <Navbar />
+      <div className="relative z-10">
+        {/* Navbar with container padding */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <Navbar />
+        </div>
 
-        <div className="pt-12 pb-16 h-[calc(100vh-88px)] flex flex-col justify-center">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="space-y-6">
-              {bannerLoading ? (
-                <>
-                  <div className="h-16 bg-gray-800 rounded-md animate-pulse mb-4 w-3/4"></div>
-                  <div className="h-24 bg-gray-800 rounded-md animate-pulse mb-4"></div>
-                  <div className="flex gap-4">
-                    <div className="h-12 bg-gray-800 rounded-full animate-pulse w-32"></div>
-                    <div className="h-12 bg-gray-800 rounded-full animate-pulse w-32"></div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
-                    {featuredMovie?.title
-                      ? truncateText(featuredMovie.title, 40)
-                      : "Loading..."}
-                  </h1>
+        {/* Hero section with featured movie */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="pt-8 sm:pt-12 pb-16 min-h-[calc(100vh-88px)] flex flex-col justify-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
+              {/* Movie info column */}
+              <div className="space-y-4 sm:space-y-6 order-2 lg:order-1">
+                {bannerLoading ? (
+                  <>
+                    <div className="h-12 sm:h-16 bg-gray-800 rounded-md animate-pulse mb-4 w-3/4"></div>
+                    <div className="h-20 sm:h-24 bg-gray-800 rounded-md animate-pulse mb-4"></div>
+                    <div className="flex flex-wrap gap-4">
+                      <div className="h-10 sm:h-12 bg-gray-800 rounded-full animate-pulse w-28 sm:w-32"></div>
+                      <div className="h-10 sm:h-12 bg-gray-800 rounded-full animate-pulse w-28 sm:w-32"></div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-tight">
+                      {featuredMovie?.title
+                        ? truncateText(featuredMovie.title, 40)
+                        : "Loading..."}
+                    </h1>
 
-                  <p className="text-lg text-gray-300 max-w-xl">
-                    {featuredMovie?.overview
-                      ? truncateText(featuredMovie.overview, 200)
-                      : "Loading movie description..."}
-                  </p>
-
-                  {featuredMovie?.release_date && (
-                    <p className="text-md text-gray-400">
-                      Release Date:{" "}
-                      {formatReleaseDate(featuredMovie.release_date)}
+                    <p className="text-base sm:text-lg text-gray-300 max-w-xl">
+                      {featuredMovie?.overview
+                        ? truncateText(featuredMovie.overview, 200)
+                        : "Loading movie description..."}
                     </p>
-                  )}
 
-                  <div className="flex flex-wrap gap-4 pt-4">
-                    <Button
-                      size="lg"
-                      className="bg-red-500 hover:bg-red-700 text-white rounded-full py-6 px-8"
-                      onClick={() =>
-                        (window.location.href = `/movie/${featuredMovie?.id}`)
-                      }
-                    >
-                      More Details
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="text-white border-white hover:bg-white/10 rounded-full py-6 px-8"
-                    >
-                      Add To Favorites
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
+                    {featuredMovie?.release_date && (
+                      <p className="text-sm sm:text-md text-gray-400">
+                        Release Date:{" "}
+                        {formatReleaseDate(featuredMovie.release_date)}
+                      </p>
+                    )}
 
-            <div className="flex justify-center lg:justify-end">
-              {bannerLoading || !featuredMovie?.poster_path ? (
-                <div className="relative w-[280px] md:w-[350px] aspect-[2/3] bg-gray-800 rounded-lg animate-pulse">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Film size={64} className="text-gray-700" />
+                    <div className="flex flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4">
+                      <Button
+                        size="default"
+                        className="bg-red-500 hover:bg-red-700 text-white rounded-full sm:px-6 !py-6 !px-8 sm:py-3 text-sm sm:text-base"
+                        onClick={() =>
+                          (window.location.href = `/movie/${featuredMovie?.id}`)
+                        }
+                      >
+                        More Details
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Movie poster column */}
+              <div className="flex justify-center sm:justify-end order-1 lg:order-2 mb-6 lg:mb-0">
+                {bannerLoading || !featuredMovie?.poster_path ? (
+                  <div className="relative w-[200px] xs:w-[240px] sm:w-[280px] md:w-[320px] lg:w-[350px] aspect-[2/3] bg-gray-800 rounded-lg animate-pulse">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Film size={48} className="text-gray-700" />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="relative w-[280px] md:w-[350px] aspect-[2/3] shadow-2xl rounded-lg overflow-hidden transform rotate-0 hover:rotate-1 hover:scale-[1.03] cursor-pointer border-2 border-transparent hover:border-gray-400 transition-transform duration-300">
-                  <Image
-                    src={`https://image.tmdb.org/t/p/original${featuredMovie.poster_path}`}
-                    alt={featuredMovie?.title || "Featured Movie Poster"}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+                ) : (
+                  <div className="relative w-[200px] xs:w-[240px] sm:w-[280px] md:w-[320px] lg:w-[350px] aspect-[2/3] shadow-2xl rounded-lg overflow-hidden transform rotate-0 hover:rotate-1 hover:scale-[1.03] transition-transform duration-300 cursor-pointer border-2 border-transparent hover:border-gray-400">
+                    <Image
+                      src={`https://image.tmdb.org/t/p/original${featuredMovie.poster_path}`}
+                      alt={featuredMovie?.title || "Featured Movie Poster"}
+                      sizes="(max-width: 640px) 200px, (max-width: 768px) 280px, (max-width: 1024px) 320px, 350px"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-8">
-        <SliderSections
-          isLoading={popularMoviesLoading}
-          movies={popularMovies}
-          title={"Popular"}
-        />
-        <SliderSections
-          isLoading={topRatedLoading}
-          movies={topRatedMovies}
-          title={"Top Rated"}
-        />
+        {/* Movie sliders section with dark background overlay */}
+        <div className="relative bg-black/80 pt-8 pb-16">
+            <SliderSections
+              isLoading={popularMoviesLoading}
+              movies={popularMovies}
+              title={"Popular"}
+            />
+            <SliderSections
+              isLoading={topRatedLoading}
+              movies={topRatedMovies}
+              title={"Top Rated"}
+            />
+        </div>
+
+        <Footer />
       </div>
     </main>
   );

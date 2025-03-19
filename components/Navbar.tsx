@@ -1,19 +1,21 @@
 "use client";
 
-import { Film, Search, X, Heart, User, LogOut } from "lucide-react";
+import { Film, Search, X, Heart, User, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import Cookies from "js-cookie";
-import axios from "axios"; // Make sure to import axios
+import axios from "axios";
 
 const Navbar = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string>("");
 
@@ -44,6 +46,10 @@ const Navbar = () => {
     setIsProfileOpen(!isProfileOpen);
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       searchContainerRef.current &&
@@ -60,6 +66,14 @@ const Navbar = () => {
     ) {
       setIsProfileOpen(false);
     }
+
+    if (
+      mobileMenuRef.current &&
+      !mobileMenuRef.current.contains(event.target as Node) &&
+      isMobileMenuOpen
+    ) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -67,7 +81,7 @@ const Navbar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isSearchExpanded, isProfileOpen]);
+  }, [isSearchExpanded, isProfileOpen, isMobileMenuOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,17 +89,18 @@ const Navbar = () => {
     if (query) {
       router.push(`/browse?search=${encodeURIComponent(query)}`);
       setIsSearchExpanded(false);
+      setIsMobileMenuOpen(false);
     }
   };
 
   const handleLogout = async () => {
     try {
       // Call logout API endpoint to clear the cookie server-side
-      await axios.post('/api/logout');
-      
+      await axios.post("/api/logout");
+
       // Clear localStorage
       localStorage.removeItem("user_details");
-      
+
       // Redirect to login page with full page refresh
       window.location.href = "/";
     } catch (error) {
@@ -97,21 +112,32 @@ const Navbar = () => {
   };
 
   return (
-    <header className="py-6">
+    <header className="py-4 md:py-6">
       <div className="flex items-center justify-between">
+        {/* Logo */}
         <div className="flex items-center">
-          <Film className="h-9 w-9 text-red-500 mr-2" />
-          <Link href="/home" className="text-4xl font-bold">
+          <Film className="h-7 w-7 md:h-9 md:w-9 text-red-500 mr-2" />
+          <Link href="/home" className="text-2xl md:text-4xl font-bold">
             CineVerse
           </Link>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {/* Mobile menu button - visible on small screens */}
+        <button
+          className="md:hidden p-2 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white transition-colors z-50"
+          onClick={toggleMobileMenu}
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        {/* Desktop navigation - hidden on small screens */}
+        <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
           <div ref={searchContainerRef} className="relative flex items-center">
             <div
               className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out bg-black/20 rounded-full border border-gray-700 ${
-                isSearchExpanded ? "w-64 pl-4 pr-1" : "w-10 p-1"
-              } h-12`}
+                isSearchExpanded ? "w-48 lg:w-64 pl-4 pr-1" : "w-10 p-1"
+              } h-10 lg:h-12`}
             >
               {!isSearchExpanded ? (
                 <button
@@ -154,7 +180,7 @@ const Navbar = () => {
 
           <Link
             href="/favorites"
-            className="p-3 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-500 transition-all"
+            className="p-2 lg:p-3 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-500 transition-all"
             aria-label="Favorites"
           >
             <Heart className="h-5 w-5" />
@@ -163,7 +189,7 @@ const Navbar = () => {
           <div className="relative" ref={profileDropdownRef}>
             <button
               onClick={toggleProfile}
-              className="p-3 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white hover:border-white transition-all"
+              className="p-2 lg:p-3 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white hover:border-white transition-all"
               aria-label="User profile"
             >
               <User className="h-5 w-5" />
@@ -187,6 +213,75 @@ const Navbar = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile menu - only visible on small screens when menu is open */}
+        {isMobileMenuOpen && (
+          <div
+            ref={mobileMenuRef}
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-40 md:hidden flex flex-col"
+          >
+            <div className="flex justify-end p-4">
+              <button
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-full bg-gray-800/50 text-gray-400 hover:text-white"
+                aria-label="Close menu"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="flex flex-col items-center justify-center flex-1 gap-6">
+              <div className="w-full max-w-xs px-4">
+                <form
+                  onSubmit={handleSearch}
+                  className="flex items-center w-full bg-black/20 rounded-full border border-gray-700 px-4 h-12"
+                >
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search movies..."
+                    className="bg-transparent border-none outline-none w-full text-sm text-gray-200 placeholder-gray-500 py-2"
+                  />
+                  <button
+                    type="submit"
+                    className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors"
+                    aria-label="Search"
+                  >
+                    <Search className="h-4 w-4" />
+                  </button>
+                </form>
+              </div>
+
+              <Link
+                href="/favorites"
+                className="flex items-center justify-center w-full max-w-xs py-3 rounded-lg bg-black/20 border border-gray-700 text-gray-300 hover:text-red-500 hover:border-red-500 transition-all"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Heart className="h-5 w-5 mr-2" />
+                <span>Favorites</span>
+              </Link>
+
+              <div className="w-full max-w-xs">
+                <div className="rounded-lg bg-black/20 border border-gray-700 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-800">
+                    <p className="text-sm text-gray-300 truncate">
+                      {userEmail}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors"
+                    >
+                      <LogOut className="h-5 w-5 mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
