@@ -57,11 +57,10 @@ export default function AuthPage() {
       [id]: type === "checkbox" ? checked : value,
     });
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       if (!isLogin) {
         if (formData.password !== formData.confirmPassword) {
@@ -69,29 +68,46 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-
+  
         if (formData.password.length < 8) {
           toast.error("Password must be at least 8 characters long");
           setLoading(false);
           return;
         }
       }
-
+  
       const endpoint = isLogin ? "/api/login" : "/api/register";
+      console.log(`Submitting to ${endpoint}`);
+      
       const payload = {
         email: formData.email,
         password: formData.password,
       };
-
+  
+      // Use withCredentials to accept cookies from response
       const response = await axios.post(endpoint, payload, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
-
+  
       if (response.data.success) {
+        console.log("Authentication successful:", response.data);
+        
+        const user_details = {
+          email: formData.email,
+          favorites: [],
+        };
+  
+        localStorage.setItem("user_details", JSON.stringify(user_details));
         toast.success(response.data.message);
-
+  
+        // Instead of router.push, use window.location for a full page reload
+        // This ensures the cookie is properly set before middleware checks it
         setTimeout(() => {
-          router.push("/home");
-        }, 800);
+          window.location.href = "/home";
+        }, 500);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
@@ -129,7 +145,7 @@ export default function AuthPage() {
       <div className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90 z-0" />
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col">
+      <div className="relative z-10 w-[90%] mx-auto  flex-1 flex flex-col">
         {/* Header */}
         <Navbar />
 
@@ -170,14 +186,6 @@ export default function AuthPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    {isLogin && (
-                      <Link
-                        href="#"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    )}
                   </div>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -215,21 +223,6 @@ export default function AuthPage() {
                   </div>
                 )}
 
-                {isLogin && (
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="rememberMe"
-                      checked={formData.rememberMe}
-                      onCheckedChange={(checked) =>
-                        setFormData({ ...formData, rememberMe: !!checked })
-                      }
-                    />
-                    <Label htmlFor="rememberMe" className="text-sm font-normal">
-                      Remember me for 30 days
-                    </Label>
-                  </div>
-                )}
-
                 <Button
                   type="submit"
                   variant="default"
@@ -245,8 +238,8 @@ export default function AuthPage() {
 
                 <div className="text-center text-sm text-gray-400">
                   {isLogin
-                    ? "Don't have an account?"
-                    : "Already have an account?"}
+                    ? "Don't have an account ? "
+                    : "Already have an account ? "}
                   <Button
                     type="button"
                     variant="link"

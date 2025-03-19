@@ -2,68 +2,77 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 
-// Paths that don't require authentication
-const publicPaths = ["/", "/login", "/register", "/home","/movie"];
-const authRequiredPaths = ["/profile", "/settings", "/movies", "/tv-shows"];
+// Define public and protected routes
+const publicPaths = ["/", "/login", "/register"];
+const authRequiredPaths = ["/home", "/browse", "/favorites"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Check if the path requires authentication
-  const requiresAuth = authRequiredPaths.some((path) =>
-    pathname.startsWith(path)
+  
+  // Skip processing for API routes and static assets
+  if (pathname.startsWith('/api/') || 
+      pathname.startsWith('/_next/') || 
+      pathname.includes('.')) {
+    return NextResponse.next();
+  }
+  
+  // Check if route requires authentication
+  const requiresAuth = authRequiredPaths.some(path => 
+    pathname === path || pathname.startsWith(`${path}/`)
   );
-  const isPublicPath = publicPaths.some((path) => pathname === path);
-
-  // Get auth token from cookie
+  
+  // Check if it's a public route
+  const isPublicPath = publicPaths.some(path => pathname === path);
+  
+  // Get auth token from cookies
   const authToken = request.cookies.get("auth_token")?.value;
-
-  // If user is authenticated and tries to access a public path like "/", redirect them to "/home"
+  
+  // Handle authenticated users on public pages (redirect to home)
   if (isPublicPath && authToken) {
     try {
-      const decoded = verifyToken(authToken);
-      if (decoded) {
-        return NextResponse.redirect(new URL("/home", request.url));
-      }
+      // Simple check if token exists (no need to verify for redirect)
+      return NextResponse.redirect(new URL("/home", request.url));
     } catch (error) {
-      console.error("Invalid token:", error);
-      // If token verification fails, clear the invalid cookie
-      const response = NextResponse.next();
-      response.cookies.delete("auth_token");
-      return response;
+      // If error, continue to public page
+      return NextResponse.next();
     }
   }
-
-  // If user is unauthenticated and tries to access a protected route, redirect them to "/"
+  
+  // Handle unauthenticated users on protected pages
   if (requiresAuth && !authToken) {
+    // Redirect to login page
     return NextResponse.redirect(new URL("/", request.url));
   }
-
-  // For protected routes, verify the token is valid
+  
+  // For authenticated users on protected pages, verify token
   if (requiresAuth && authToken) {
     try {
       const decoded = verifyToken(authToken);
       if (!decoded) {
-        // If token is invalid, redirect to login
+        // Invalid token, redirect to login
         const response = NextResponse.redirect(new URL("/", request.url));
         response.cookies.delete("auth_token");
         return response;
       }
+      
+      // Valid token, proceed
+      return NextResponse.next();
     } catch (error) {
-      console.error("Error verifying token:", error);
-      // If token verification fails, clear the cookie and redirect
+      // Token verification failed
       const response = NextResponse.redirect(new URL("/", request.url));
       response.cookies.delete("auth_token");
       return response;
     }
   }
-
+  
+  // Default: proceed with the request
   return NextResponse.next();
 }
 
-// Specify which routes the middleware should run on
+// Configure which routes this middleware applies to
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon\\.ico|public|.*\\.(?:png|jpg|jpeg|gif|svg|webp)$).*)",
+    // Match all paths except static files and API routes
+    '/((?!_next/static|_next/image|favicon.ico|public/|api/).*)'
   ],
 };

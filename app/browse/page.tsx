@@ -2,6 +2,7 @@
 import MovieCard from "@/components/MovieCard";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
+import { redirect, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Movie {
@@ -19,14 +20,26 @@ const Page = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
 
+  const searchParams = useSearchParams();
+  const searchValue = searchParams.get("search");
+  const categoryValue = searchParams.get("category");
+  const formattedCategory = categoryValue?.replace(/\s+/g, "").toLowerCase();
+
   useEffect(() => {
-    fetchMovies(currentPage);
-  }, [currentPage]);
+    if (searchValue && searchValue !== "") {
+      fetchSearchMovies(currentPage);
+    } else if (formattedCategory === "toprated") {
+      fetchTopRatedMovies(currentPage);
+    } else if (formattedCategory === "popular") {
+      fetchPopularMovies(currentPage);
+    } else {
+      redirect("/home");
+    }
+  }, [currentPage, searchParams]);
 
-
-  const fetchMovies = async (page: number) => {
+  const fetchSearchMovies = async (page: number) => {
     setLoading(true);
-    const url = `https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${page}`;
+    const url = `https://api.themoviedb.org/3/search/movie?query=${searchValue}&include_adult=false&language=en-US&page=${page}`;
 
     const options = {
       method: "GET",
@@ -47,6 +60,50 @@ const Page = () => {
     }
   };
 
+  const fetchTopRatedMovies = async (page: number) => {
+    const url = `https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${page}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: process.env.NEXT_PUBLIC_TMDB_AUTHORIZATION,
+      },
+    };
+
+    try {
+      const response = await axios.get(url, options);
+      setMovies(response.data.results);
+      setTotalPages(Math.min(response.data.total_pages, 500));
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching top rated movies:", error);
+      setLoading(false);
+    }
+  };
+
+  const fetchPopularMovies = async (page: number) => {
+    const url = `https://api.themoviedb.org/3/movie/popular?language=en-US&page=${page}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: process.env.NEXT_PUBLIC_TMDB_AUTHORIZATION,
+      },
+    };
+
+    try {
+      const response = await axios.get(url, options);
+      setMovies(response.data.results);
+      setTotalPages(Math.min(response.data.total_pages, 500));
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching top rated movies:", error);
+      setLoading(false);
+    }
+  };
+
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -54,7 +111,6 @@ const Page = () => {
     }
   };
 
-  // Generate array of page numbers to show
   const getPageNumbers = () => {
     const pageNumbers: (number | string)[] = [];
 
@@ -118,8 +174,13 @@ const Page = () => {
       <div className="relative z-20 max-w-[90%] container mx-auto px-4">
         <Navbar />
 
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-white">Top Rated Movies</h2>
+        <div className="flex items-center justify-between mt-8 mb-8">
+          <h2 className="text-4xl font-bold text-white">
+            Results For :{" "}
+            <span className="text-red-500 underline-offset-8 underline capitalize tracking-wide">
+              {formattedCategory ? formattedCategory : searchValue}
+            </span>{" "}
+          </h2>
           {!loading && (
             <div className="text-gray-400">
               Page {currentPage} of {totalPages}
@@ -165,7 +226,7 @@ const Page = () => {
                       onClick={() => handlePageChange(pageNumber as number)}
                       className={`w-10 h-10 flex items-center justify-center rounded-md ${
                         currentPage === pageNumber
-                          ? "bg-red-600 text-white"
+                          ? "bg-red-500 text-white"
                           : "bg-gray-800 text-white hover:bg-gray-700"
                       }`}
                     >

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { signToken } from "@/lib/jwt";
 import bcrypt from "bcryptjs";
 import User from "@/lib/UserSchema.js";
-import {connectToDatabase} from "@/lib/Connection.js"
+import { connectToDatabase } from "@/lib/Connection.js";
 
 interface User {
   id: string;
@@ -68,8 +68,9 @@ export async function POST(request: Request) {
       success: true,
       message: "Registration successful",
     });
+    const tokenValue = await token;
 
-    response.cookies.set("auth_token", token, {
+    response.cookies.set("auth_token", tokenValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

@@ -30,19 +30,12 @@ const SliderSections = ({
     }
   };
 
-  const handleViewAll = () => {
-    router.push("/browse");
+  const handleViewAll = (title : string) => {
+    router.push(`/browse?category=${title}`);
   };
 
-  // Generate placeholder items for loading state
-  const placeholderItems = Array(6)
-    .fill(0)
-    .map((_, index) => ({
-      id: index,
-      title: "",
-      poster_path: "",
-      vote_average: 0,
-    }));
+  console.log(movies)
+
 
   return (
     <div className="max-w-[90%] mx-auto my-8">
@@ -50,7 +43,7 @@ const SliderSections = ({
       <div className="flex justify-between items-center mb-4 px-4">
         <h2 className="text-2xl font-bold text-white">{title}</h2>
         <Button
-          onClick={() => handleViewAll()}
+          onClick={() => handleViewAll(title)}
           className="bg-transparent border border-white text-white hover:bg-transparent hover:text-white"
         >
           View All

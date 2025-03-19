@@ -56,7 +56,10 @@ export async function POST(request: Request) {
       success: true,
       message: "Login successful",
     });
-    response.cookies.set("auth_token", token, {
+
+    const tokenValue = await token;
+
+    response.cookies.set("auth_token", tokenValue, {
       httpOnly: true,
       secure: false, // Change to false for localhost development
       sameSite: "lax", // Try "lax" instead of "strict" for development

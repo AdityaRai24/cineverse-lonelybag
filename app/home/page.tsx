@@ -111,7 +111,6 @@ export default function HomePage() {
     }
   };
 
-  // Format release date to human-readable format
   const formatReleaseDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -122,7 +121,6 @@ export default function HomePage() {
     });
   };
 
-  // Truncate text with ellipsis if it exceeds maxLength
   const truncateText = (text: string, maxLength: number) => {
     if (!text) return "";
     return text.length > maxLength
@@ -136,7 +134,7 @@ export default function HomePage() {
         {/* Banner Image or Skeleton */}
         {!bannerLoading && featuredMovie?.backdrop_path ? (
           <Image
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="100vw"
             src={`https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path}`}
             alt={featuredMovie.title || "Featured Movie"}
             fill
@@ -147,17 +145,13 @@ export default function HomePage() {
         ) : (
           <div className="w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 animate-pulse"></div>
         )}
-        {/* Left gradient fade */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
-        {/* Bottom fade to red */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-red-600/20 to-transparent z-10"></div>
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-red-500/20 to-transparent z-10"></div>
       </div>
 
-      {/* Navbar integrated into main content */}
       <div className="relative z-20 max-w-[90%] container mx-auto px-4">
         <Navbar />
 
-        {/* Hero Content */}
         <div className="pt-12 pb-16 h-[calc(100vh-88px)] flex flex-col justify-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="space-y-6">
@@ -194,19 +188,19 @@ export default function HomePage() {
                   <div className="flex flex-wrap gap-4 pt-4">
                     <Button
                       size="lg"
-                      className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8"
+                      className="bg-red-500 hover:bg-red-700 text-white rounded-full py-6 px-8"
                       onClick={() =>
                         (window.location.href = `/movie/${featuredMovie?.id}`)
                       }
                     >
-                      Watch now
+                      More Details
                     </Button>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="text-white border-white hover:bg-white/10 rounded-full px-8"
+                      className="text-white border-white hover:bg-white/10 rounded-full py-6 px-8"
                     >
-                      Watch trailer
+                      Add To Favorites
                     </Button>
                   </div>
                 </>

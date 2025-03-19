@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 // Icons
-import { ChevronLeft, Clock, Star, Calendar, Users, Tag } from "lucide-react";
+import { ChevronLeft, Clock, Star, Calendar, Users, Tag, Film } from "lucide-react";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 
@@ -157,7 +157,7 @@ export default function MovieDetailPage({
           <p className="text-white mb-6">{error}</p>
           <Button
             onClick={() => router.push("/")}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-500 hover:bg-red-700"
           >
             Back to Home
           </Button>
@@ -211,8 +211,10 @@ export default function MovieDetailPage({
                   className="w-full h-auto"
                 />
               ) : (
-                <div className="bg-gray-800 w-full h-[450px] flex items-center justify-center">
-                  <p className="text-gray-400">No poster available</p>
+                <div className="relative w-[280px] md:w-[350px] aspect-[2/3] bg-gray-800 rounded-lg animate-pulse">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Film size={64} className="text-gray-700" />
+                  </div>
                 </div>
               )}
             </div>
