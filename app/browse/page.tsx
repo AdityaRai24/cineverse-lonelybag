@@ -173,8 +173,12 @@ const Page = () => {
       />
 
       <div className="relative z-20">
-        <div className="relative z-20 mb-16 max-w-[90%] container mx-auto px-4">
-          <Navbar />
+        <div className="max-w-[90%] mx-auto">
+        <Navbar />
+
+        </div>
+
+        <div className="relative z-20 mb-16 max-w-[90%] container mx-auto px-6">
 
           <div className="flex items-center justify-between mt-8 mb-8">
             <h2 className="text-4xl font-bold text-white">

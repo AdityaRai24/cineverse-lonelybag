@@ -87,7 +87,7 @@ const Navbar = () => {
     e.preventDefault();
     const query = searchInputRef.current?.value.trim();
     if (query) {
-      router.push(`/browse?search=${encodeURIComponent(query)}`);
+      window.location.href = `/browse?search=${encodeURIComponent(query)}`;
       setIsSearchExpanded(false);
       setIsMobileMenuOpen(false);
     }
@@ -95,24 +95,18 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Call logout API endpoint to clear the cookie server-side
       await axios.post("/api/logout");
-
-      // Clear localStorage
       localStorage.removeItem("user_details");
-
-      // Redirect to login page with full page refresh
       window.location.href = "/";
     } catch (error) {
       console.error("Logout error:", error);
-      // Fallback - attempt to clear client-side cookie and redirect
       Cookies.remove("auth_token", { path: "/" });
       window.location.href = "/";
     }
   };
 
   return (
-    <header className="py-3 px-4 sm:py-4 md:py-6 md:px-6 lg:px-8">
+    <header className="py-3 px-4 sm:py-4 md:py-6 md:px-6">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center z-20">
@@ -120,14 +114,16 @@ const Navbar = () => {
           <Link
             href="/home"
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold truncate"
-          >
-            CineVerse
-          </Link>
-        </div>
+            >
+              CineVerse
+            </Link>
+          </div>
 
         {/* Mobile menu button - visible on small screens */}
         <button
-          className="md:hidden p-2 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white transition-colors z-50"
+          className={`
+            ${isMobileMenuOpen ? "hidden" : ""}
+            md:hidden p-2 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white transition-colors z-50`}
           onClick={toggleMobileMenu}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >

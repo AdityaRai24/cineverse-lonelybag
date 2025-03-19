@@ -157,7 +157,7 @@ export default function HomePage() {
         </div>
 
         {/* Hero section with featured movie */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-16">
           <div className="pt-8 sm:pt-12 pb-16 min-h-[calc(100vh-88px)] flex flex-col justify-center">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
               {/* Movie info column */}

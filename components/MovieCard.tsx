@@ -76,21 +76,20 @@ const MovieCard = ({
       onClick={() => router.push(`/movie/${item.id}`)}
     >
       <div className="bg-gray-900 group rounded-lg overflow-hidden transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] border-2 border-transparent hover:border-gray-400 h-full flex flex-col">
-        <div className="relative w-full h-56 sm:h-60 md:h-72 lg:h-[380px] flex-shrink-0">
+        <div className="relative w-full aspect-[2/3] flex-shrink-0">
           {item?.poster_path ? (
             <div className="w-full h-full flex items-center justify-center">
               <Image
                 src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
                 alt={item.title || "Movie poster"}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 200px, (max-width: 1024px) 240px, 250px"
                 className="object-cover transition-transform duration-500"
                 priority={index < 4}
-                style={{ objectPosition: "center" }}
               />
             </div>
           ) : (
-            <div className="w-full h-full rounded-lg">
+            <div className="w-full h-full rounded-lg bg-gray-800">
               <div className="flex w-full h-full items-center justify-center">
                 <Film size={48} className="text-gray-700" />
               </div>
@@ -110,7 +109,7 @@ const MovieCard = ({
         >
           {isFavorite ? (
             <Image
-              src={"/heart-filled.png"}
+              src="/heart-filled.png"
               width={16}
               height={16}
               alt="Favorite"
@@ -118,7 +117,7 @@ const MovieCard = ({
             />
           ) : (
             <Image
-              src={"/heart.png"}
+              src="/heart.png"
               width={16}
               height={16}
               alt="Favorite"

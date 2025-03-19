@@ -231,11 +231,11 @@ export default function MovieDetailPage({
         </div>
       </div>
 
-      <div className="container mx-auto px-4 -mt-32 sm:-mt-48 md:-mt-64 lg:-mt-96 relative z-20">
+      <div className="container mx-auto px-4 lg:px-16 -mt-32 sm:-mt-48 md:-mt-64 lg:-mt-96 relative z-20">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">
           {/* Movie Poster */}
           <div className="w-full md:w-1/3 lg:w-1/4 flex justify-center md:justify-start mb-6 md:mb-0">
-            <div className="w-[200px] sm:w-[250px] md:w-full max-w-[350px] rounded-xl overflow-hidden transform rotate-0 hover:scale-[1.03] cursor-pointer hover:rotate-1 transition-transform duration-300 shadow-2xl border-2 border-transparent hover:border-gray-400 h-auto">
+            <div className="w-[200px] sm:w-[250px] md:w-full max-w-[350px] rounded-xl overflow-hidden transform rotate-0 hover:scale-[1.01] cursor-pointer hover:rotate-[0.5deg] transition-transform duration-300 shadow-2xl border-2 border-transparent hover:border-gray-400 h-auto">
               {movie.poster_path ? (
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}

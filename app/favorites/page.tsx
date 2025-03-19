@@ -25,7 +25,7 @@ const Favorites = () => {
     <div>
       <div className="contianer mx-auto max-w-[90%]">
         <Navbar />
-        <main className="min-h-screen bg-gray-950 py-8">
+        <main className="min-h-screen bg-gray-950 py-8 px-4">
           <div className="container mx-auto px-4">
             <h1 className="text-3xl font-bold text-white mb-6">
               Your Favorites
