@@ -34,7 +34,6 @@ const SliderSections = ({
     router.push(`/browse?category=${title}`);
   };
 
-  console.log(movies)
 
 
   return (

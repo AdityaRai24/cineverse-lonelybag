@@ -74,7 +74,6 @@ export default function AuthPage() {
       }
   
       const endpoint = isLogin ? "/api/login" : "/api/register";
-      console.log(`Submitting to ${endpoint}`);
       
       const payload = {
         email: formData.email,
@@ -90,7 +89,6 @@ export default function AuthPage() {
       });
   
       if (response.data.success) {
-        console.log("Authentication successful:", response.data);
         
         const user_details = {
           email: formData.email,

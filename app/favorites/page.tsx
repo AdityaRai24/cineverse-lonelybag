@@ -1,6 +1,6 @@
 "use client";
 import Navbar from "@/components/Navbar";
-import MovieCard from "@/components/MovieCard"; // Import the MovieCard component
+import MovieCard from "@/components/MovieCard";
 import React, { useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 
@@ -14,33 +14,44 @@ const Favorites = () => {
     setFavorites(storedFavorites);
   }, []);
 
-  return (
-    <div className="min-h-screen flex flex-col bg-black text-white">
-      <div
-        className="fixed inset-0 bg-cover bg-center z-0 opacity-40"
-        style={{
-          backgroundImage: `url('/browsebg.png')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+  // Function to update favorites when removed
+  const handleFavoriteChange = (updatedItem: any) => {
+    setFavorites((prevFavorites) =>
+      prevFavorites.filter((fav: any) => fav.id !== updatedItem.id)
+    );
+  };
 
-      <div className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90 z-0" />
-      <div className="relative z-10 w-full flex-1 flex flex-col">
-      <div className="relative z-10 w-[90%] px-4 mx-auto flex-1 flex flex-col mb-16">
-          <Navbar />
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {favorites.length > 0 ? (
-              favorites.map((item, index) => (
-                <MovieCard key={index} item={item} index={index} />
-              ))
-            ) : (
-              <p className="text-center text-gray-400">No favorites found.</p>
-            )}
+  return (
+    <div>
+      <div className="contianer mx-auto max-w-[90%]">
+        <Navbar />
+        <main className="min-h-screen bg-gray-950 py-8">
+          <div className="container mx-auto px-4">
+            <h1 className="text-3xl font-bold text-white mb-6">
+              Your Favorites
+            </h1>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {favorites.length > 0 ? (
+                favorites.map((item, index) => (
+                  <MovieCard
+                    key={index}
+                    item={item}
+                    index={index}
+                    onFavoriteChange={handleFavoriteChange}
+                    fromFavoritesPage
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center text-xl text-gray-400 py-12">
+                  No favorites found.
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-        <Footer />
+        </main>
       </div>
+      <Footer />
     </div>
   );
 };

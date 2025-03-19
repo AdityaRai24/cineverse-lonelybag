@@ -15,9 +15,17 @@ interface MovieCardProps {
   };
   index: number;
   isLoading?: boolean;
+  fromFavoritesPage?: boolean;
+  onFavoriteChange?: (item: any) => void;
 }
 
-const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
+const MovieCard = ({
+  item,
+  index,
+  isLoading = false,
+  fromFavoritesPage = false,
+  onFavoriteChange,
+}: MovieCardProps) => {
   const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -33,6 +41,11 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
     if (isFavorite) {
       favorites = favorites.filter((fav: any) => fav.id !== item.id);
       toast.success("Removed from favorites");
+
+      // If we're on the favorites page, notify the parent component
+      if (fromFavoritesPage && onFavoriteChange) {
+        onFavoriteChange(item);
+      }
     } else {
       favorites.push(item);
       toast.success("Added to favorites");
@@ -46,11 +59,11 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
     return (
       <div className="flex-none w-full h-full">
         <div className="bg-gray-900 rounded-lg overflow-hidden shadow-xl border border-gray-800">
-          <div className="relative h-40 sm:h-64 md:h-[340px] bg-gray-800 animate-pulse" />
-          <div className="p-3 sm:p-4 bg-gray-900">
-            <div className="h-4 sm:h-6 bg-gray-800 rounded-md animate-pulse mb-2" />
-            <div className="h-3 sm:h-4 bg-gray-800 rounded-md animate-pulse w-2/3" />
-            <div className="h-2 sm:h-3 bg-gray-800 rounded-md animate-pulse w-1/4 mt-2" />
+          <div className="relative h-56 sm:h-64 md:h-[340px] bg-gray-800 animate-pulse" />
+          <div className="p-4 bg-gray-900">
+            <div className="h-5 sm:h-6 bg-gray-800 rounded-md animate-pulse mb-2" />
+            <div className="h-4 bg-gray-800 rounded-md animate-pulse w-2/3" />
+            <div className="h-3 bg-gray-800 rounded-md animate-pulse w-1/4 mt-2" />
           </div>
         </div>
       </div>
@@ -59,20 +72,23 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
 
   return (
     <div
-      className="relative flex-none w-full sm:w-[200px] md:w-[240px] lg:w-[280px] h-full"
+      className="relative flex-none w-full sm:w-[200px] md:w-[240px] lg:w-[250px] h-full"
       onClick={() => router.push(`/movie/${item.id}`)}
     >
-      <div className="bg-gray-900 group rounded-lg overflow-hidden transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] border-2 border-transparent hover:border-gray-400 h-full">
-        <div className="relative h-48 sm:h-60 md:h-72 lg:h-[380px]">
+      <div className="bg-gray-900 group rounded-lg overflow-hidden transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] border-2 border-transparent hover:border-gray-400 h-full flex flex-col">
+        <div className="relative w-full h-56 sm:h-60 md:h-72 lg:h-[380px] flex-shrink-0">
           {item?.poster_path ? (
-            <Image
-              src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
-              alt={item.title || "Movie poster"}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-500"
-              priority={index < 4}
-            />
+            <div className="w-full h-full flex items-center justify-center">
+              <Image
+                src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
+                alt={item.title || "Movie poster"}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-500"
+                priority={index < 4}
+                style={{ objectPosition: "center" }}
+              />
+            </div>
           ) : (
             <div className="w-full h-full rounded-lg">
               <div className="flex w-full h-full items-center justify-center">
@@ -82,7 +98,7 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
           )}
 
           {/* Rating Badge */}
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-xs sm:text-sm font-bold rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-xs sm:text-sm font-bold rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300 z-10">
             {item.vote_average?.toFixed(1) || "N/A"}
           </div>
         </div>
@@ -90,7 +106,7 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
         {/* Favorite Button */}
         <button
           onClick={toggleFavorite}
-          className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-gray-800 bg-opacity-75 p-1.5 sm:p-2 rounded-full shadow-md opacity-70 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-gray-800 bg-opacity-75 p-2 rounded-full shadow-md opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
         >
           {isFavorite ? (
             <Image
@@ -98,7 +114,7 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
               width={16}
               height={16}
               alt="Favorite"
-              className="sm:w-5 sm:h-5"
+              className="w-4 h-4 sm:w-5 sm:h-5"
             />
           ) : (
             <Image
@@ -106,14 +122,14 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
               width={16}
               height={16}
               alt="Favorite"
-              className="sm:w-5 sm:h-5"
+              className="w-4 h-4 sm:w-5 sm:h-5"
             />
           )}
         </button>
 
         {/* Movie Details */}
-        <div className="p-3 sm:p-4 bg-gray-900 z-20">
-          <h3 className="text-white font-semibold text-base sm:text-lg truncate transition-colors duration-300">
+        <div className="p-4 bg-gray-900 z-20 flex-grow">
+          <h3 className="text-white font-semibold text-sm sm:text-base md:text-lg truncate transition-colors duration-300">
             {item.title}
           </h3>
           <p className="text-gray-400 text-xs sm:text-sm mt-1 truncate">
@@ -122,7 +138,7 @@ const MovieCard = ({ item, index, isLoading = false }: MovieCardProps) => {
           </p>
 
           {item.release_date && (
-            <p className="text-gray-500 text-xs mt-1 sm:mt-2">
+            <p className="text-gray-500 text-xs mt-2">
               {new Date(item.release_date).getFullYear()}
             </p>
           )}
