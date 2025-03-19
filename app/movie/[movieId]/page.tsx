@@ -4,6 +4,7 @@ import React, { use, useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 import {
   ChevronLeft,
@@ -61,6 +62,7 @@ export default function MovieDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const castScrollRef = useRef<HTMLDivElement>(null);
 
   const { movieId } = use(params);
@@ -95,6 +97,14 @@ export default function MovieDetailPage({
 
     fetchMovieDetails();
   }, [movieId]);
+
+  // Check if movie is in favorites whenever it changes
+  useEffect(() => {
+    if (movie) {
+      const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      setIsFavorite(favorites.some((fav: any) => fav.id === movie.id));
+    }
+  }, [movie]);
 
   // Format runtime to hours and minutes
   const formatRuntime = (minutes: number) => {
@@ -131,6 +141,33 @@ export default function MovieDetailPage({
     return director ? director.name : "Unknown";
   };
 
+  // Toggle favorite status
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!movie) return;
+
+    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+    if (isFavorite) {
+      favorites = favorites.filter((fav: any) => fav.id !== movie.id);
+      toast.success("Removed from favorites");
+    } else {
+      // Make sure we have all required fields for the favorites list
+      const movieToAdd = {
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        vote_average: movie.vote_average || 0,
+        release_date: movie.release_date,
+      };
+      favorites.push(movieToAdd);
+      toast.success("Added to favorites");
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    setIsFavorite(!isFavorite);
+  };
+
   // Scroll cast section
   const scrollCast = (direction: "left" | "right") => {
     if (castScrollRef.current) {
@@ -156,25 +193,92 @@ export default function MovieDetailPage({
     }
   }, [movie]);
 
-  // Loading state
+  // Improved Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black">
-        <div className="container mx-auto px-4 py-8 sm:py-16">
-          <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] bg-gray-800 rounded-lg sm:rounded-2xl animate-pulse mb-8"></div>
-          <div className="flex flex-col md:flex-row gap-4 sm:gap-8">
-            <div className="w-full md:w-1/3 lg:w-1/4">
-              <div className="w-full h-[350px] sm:h-[400px] md:h-[450px] bg-gray-800 rounded-lg sm:rounded-xl animate-pulse"></div>
+        {/* Skeleton for backdrop */}
+        <div className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[90vh] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/30 z-10"></div>
+          <div className="w-full h-full bg-gray-800 animate-pulse"></div>
+
+          {/* Back Button Skeleton */}
+          <div className="absolute top-4 left-4 z-20">
+            <div className="w-10 h-10 bg-black/50 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 lg:px-16 -mt-32 sm:-mt-48 md:-mt-64 lg:-mt-96 relative z-20">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+            {/* Movie Poster Skeleton */}
+            <div className="w-full md:w-1/3 lg:w-1/4 flex justify-center md:justify-start mb-6 md:mb-0">
+              <div className="w-[200px] sm:w-[250px] md:w-full max-w-[350px] aspect-[2/3] bg-gray-800 rounded-xl animate-pulse"></div>
             </div>
+
+            {/* Movie Details Skeleton */}
             <div className="w-full md:w-2/3 lg:w-3/4">
-              <div className="h-8 sm:h-12 bg-gray-800 rounded-md animate-pulse mb-4"></div>
-              <div className="h-4 sm:h-6 bg-gray-800 rounded-md animate-pulse mb-6 w-2/3"></div>
-              <div className="space-y-4">
-                <div className="h-4 bg-gray-800 rounded-md animate-pulse"></div>
-                <div className="h-4 bg-gray-800 rounded-md animate-pulse"></div>
-                <div className="h-4 bg-gray-800 rounded-md animate-pulse"></div>
-                <div className="h-4 bg-gray-800 rounded-md animate-pulse w-2/3"></div>
+              {/* Title */}
+              <div className="h-8 sm:h-10 md:h-12 bg-gray-800 rounded-md animate-pulse mb-4 w-3/4 mx-auto md:mx-0"></div>
+
+              {/* Tagline */}
+              <div className="h-5 sm:h-6 bg-gray-800 rounded-md animate-pulse mb-6 w-1/2 mx-auto md:mx-0"></div>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="h-6 bg-gray-800 rounded-full animate-pulse w-24 sm:w-32"
+                  ></div>
+                ))}
               </div>
+
+              {/* Genres */}
+              <div className="mb-6 flex flex-wrap justify-center md:justify-start gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-6 bg-gray-800 rounded-full animate-pulse w-16 sm:w-20"
+                  ></div>
+                ))}
+              </div>
+
+              {/* Overview */}
+              <div className="mb-6 space-y-2">
+                <div className="h-6 bg-gray-800 rounded-md animate-pulse w-1/3 mx-auto md:mx-0"></div>
+                <div className="h-4 bg-gray-800 rounded-md animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-800 rounded-md animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-800 rounded-md animate-pulse w-3/4"></div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-6 bg-gray-800 rounded-md animate-pulse w-1/3 mx-auto md:mx-0"></div>
+                    <div className="h-6 bg-gray-800 rounded-md animate-pulse w-1/2 mx-auto md:mx-0"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Cast Section Skeleton */}
+          <div className="mt-10 sm:mt-16 mb-8">
+            <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/4 mb-6"></div>
+            <div className="flex overflow-x-auto pb-4 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[140px] sm:w-[170px] md:w-[200px] bg-gray-900 rounded-lg overflow-hidden"
+                >
+                  <div className="h-[180px] sm:h-[220px] bg-gray-800 animate-pulse"></div>
+                  <div className="p-3 space-y-2">
+                    <div className="h-4 bg-gray-800 rounded-md animate-pulse w-3/4"></div>
+                    <div className="h-3 bg-gray-800 rounded-md animate-pulse w-1/2"></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -235,7 +339,7 @@ export default function MovieDetailPage({
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">
           {/* Movie Poster */}
           <div className="w-full md:w-1/3 lg:w-1/4 flex justify-center md:justify-start mb-6 md:mb-0">
-            <div className="w-[200px] sm:w-[250px] md:w-full max-w-[350px] rounded-xl overflow-hidden transform rotate-0 hover:scale-[1.01] cursor-pointer hover:rotate-[0.5deg] transition-transform duration-300 shadow-2xl border-2 border-transparent hover:border-gray-400 h-auto">
+            <div className="relative w-[200px] sm:w-[250px] md:w-full max-w-[350px] rounded-xl overflow-hidden transform rotate-0 hover:scale-[1.01] cursor-pointer hover:rotate-[0.5deg] transition-transform duration-300 shadow-2xl border-2 border-transparent hover:border-gray-400 h-auto">
               {movie.poster_path ? (
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -251,6 +355,20 @@ export default function MovieDetailPage({
                   </div>
                 </div>
               )}
+
+              {/* Add favorite button for the poster */}
+              <button
+                onClick={toggleFavorite}
+                className="absolute top-3 left-3 bg-gray-800 bg-opacity-75 p-2 rounded-full shadow-md hover:bg-opacity-90 transition-opacity duration-300 z-10"
+              >
+                <Image
+                  src={isFavorite ? "/heart-filled.png" : "/heart.png"}
+                  width={20}
+                  height={20}
+                  alt="Favorite"
+                  className="w-5 h-5"
+                />
+              </button>
             </div>
           </div>
 
@@ -300,6 +418,22 @@ export default function MovieDetailPage({
                 <Users size={18} className="text-purple-400" />
                 <span className="text-sm sm:text-base">{getDirector()}</span>
               </div>
+
+              {/* Add favorite button */}
+              <Button
+                onClick={toggleFavorite}
+                variant="outline"
+                className="rounded-full px-4 py-2 text-sm border-gray-700 hover:bg-gray-800 flex items-center gap-2"
+              >
+                <Image
+                  src={isFavorite ? "/heart-filled.png" : "/heart.png"}
+                  width={20}
+                  height={20}
+                  alt="Favorite"
+                  className="w-5 h-5"
+                />
+                {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+              </Button>
             </div>
 
             {/* Genres */}
@@ -451,15 +585,6 @@ export default function MovieDetailPage({
               ))}
             </div>
 
-            {/* Mobile indicator */}
-            <div className="flex justify-center mt-2 sm:hidden">
-              {isScrolling && (
-                <div className="flex items-center gap-1 text-gray-400 text-xs">
-                  <ChevronDown size={14} className="animate-bounce" />
-                  <span>Scroll for more</span>
-                </div>
-              )}
-            </div>
           </div>
         )}
       </div>

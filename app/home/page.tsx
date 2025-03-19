@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import toast from "react-hot-toast";
 
 interface Movie {
   id: number;
@@ -15,6 +16,7 @@ interface Movie {
   backdrop_path: string;
   poster_path: string;
   release_date: string;
+  vote_average?: number;
 }
 
 export default function HomePage() {
@@ -24,12 +26,21 @@ export default function HomePage() {
   const [popularMoviesLoading, setPopularMoviesLoading] = useState(false);
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
   const [bannerLoading, setBannerLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     fetchPopularMovies();
     fetchTopRatedMovies();
     fetchUpcomingMovies();
   }, []);
+
+  // Check if featured movie is in favorites whenever it changes
+  useEffect(() => {
+    if (featuredMovie) {
+      const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      setIsFavorite(favorites.some((fav: any) => fav.id === featuredMovie.id));
+    }
+  }, [featuredMovie]);
 
   const fetchUpcomingMovies = async () => {
     const url =
@@ -129,6 +140,32 @@ export default function HomePage() {
       : text;
   };
 
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!featuredMovie) return;
+
+    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+    if (isFavorite) {
+      favorites = favorites.filter((fav: any) => fav.id !== featuredMovie.id);
+      toast.success("Removed from favorites");
+    } else {
+      // Make sure we have all required fields for the favorites list
+      const movieToAdd = {
+        id: featuredMovie.id,
+        title: featuredMovie.title,
+        poster_path: featuredMovie.poster_path,
+        vote_average: featuredMovie.vote_average || 0,
+        release_date: featuredMovie.release_date,
+      };
+      favorites.push(movieToAdd);
+      toast.success("Added to favorites");
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    setIsFavorite(!isFavorite);
+  };
+
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* Full-screen banner background */}
@@ -202,6 +239,24 @@ export default function HomePage() {
                       >
                         More Details
                       </Button>
+
+                      <Button
+                        size="default"
+                        variant="outline"
+                        className="rounded-full sm:px-6 !py-6 !px-8 sm:py-3 text-sm sm:text-base border-gray-700 hover:bg-gray-800 flex items-center gap-2"
+                        onClick={toggleFavorite}
+                      >
+                        <Image
+                          src={isFavorite ? "/heart-filled.png" : "/heart.png"}
+                          width={20}
+                          height={20}
+                          alt="Favorite"
+                          className="w-5 h-5"
+                        />
+                        {isFavorite
+                          ? "Remove from Favorites"
+                          : "Add to Favorites"}
+                      </Button>
                     </div>
                   </>
                 )}
@@ -223,7 +278,24 @@ export default function HomePage() {
                       sizes="(max-width: 640px) 200px, (max-width: 768px) 280px, (max-width: 1024px) 320px, 350px"
                       fill
                       className="object-cover"
+                      onClick={() =>
+                        (window.location.href = `/movie/${featuredMovie?.id}`)
+                      }
                     />
+
+                    {/* Add favorite button for the poster */}
+                    <button
+                      onClick={toggleFavorite}
+                      className="absolute top-3 left-3 bg-gray-800 bg-opacity-75 p-2 rounded-full shadow-md hover:bg-opacity-90 transition-opacity duration-300 z-10"
+                    >
+                      <Image
+                        src={isFavorite ? "/heart-filled.png" : "/heart.png"}
+                        width={20}
+                        height={20}
+                        alt="Favorite"
+                        className="w-5 h-5"
+                      />
+                    </button>
                   </div>
                 )}
               </div>
@@ -233,16 +305,16 @@ export default function HomePage() {
 
         {/* Movie sliders section with dark background overlay */}
         <div className="relative bg-black/80 pt-8 pb-16">
-            <SliderSections
-              isLoading={popularMoviesLoading}
-              movies={popularMovies}
-              title={"Popular"}
-            />
-            <SliderSections
-              isLoading={topRatedLoading}
-              movies={topRatedMovies}
-              title={"Top Rated"}
-            />
+          <SliderSections
+            isLoading={popularMoviesLoading}
+            movies={popularMovies}
+            title={"Popular"}
+          />
+          <SliderSections
+            isLoading={topRatedLoading}
+            movies={topRatedMovies}
+            title={"Top Rated"}
+          />
         </div>
 
         <Footer />
