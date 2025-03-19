@@ -1,10 +1,20 @@
 "use client";
 import React, { useRef } from "react";
 import { Button } from "./ui/button";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import MovieCard from "./MovieCard";
 
-const SliderSections = ({ title, movies }: { title: string; movies?: any }) => {
+const SliderSections = ({
+  title,
+  movies,
+  isLoading = false,
+}: {
+  title: string;
+  movies?: any;
+  isLoading?: boolean;
+}) => {
   const sliderRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const scrollAmount = 300; // Adjust based on item width
 
@@ -20,111 +30,96 @@ const SliderSections = ({ title, movies }: { title: string; movies?: any }) => {
     }
   };
 
+  const handleViewAll = () => {
+    router.push("/browse");
+  };
+
+  // Generate placeholder items for loading state
+  const placeholderItems = Array(6)
+    .fill(0)
+    .map((_, index) => ({
+      id: index,
+      title: "",
+      poster_path: "",
+      vote_average: 0,
+    }));
+
   return (
-    <section className="relative z-20">
-      <div className="mx-auto max-w-[90%]">
-        {/* Title Section */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-white">{title}</h2>
-            <div className="h-1 w-24 bg-red-600 mt-2"></div>
-          </div>
-          <div>
-            {" "}
-            <Button className="bg-transparent border border-white text-white hover:bg-transparent hover:text-white">View All</Button>{" "}
-          </div>
+    <div className="max-w-[90%] mx-auto my-8">
+      {/* Title Section */}
+      <div className="flex justify-between items-center mb-4 px-4">
+        <h2 className="text-2xl font-bold text-white">{title}</h2>
+        <Button
+          onClick={() => handleViewAll()}
+          className="bg-transparent border border-white text-white hover:bg-transparent hover:text-white"
+        >
+          View All
+        </Button>
+      </div>
+
+      {/* Slider */}
+      <div className="relative">
+        <div
+          ref={sliderRef}
+          className="flex overflow-x-auto gap-4 px-4 py-2 scrollbar-hide scroll-smooth"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {movies?.map((item: any, index: number) => (
+            <MovieCard
+              isLoading={isLoading}
+              key={item.id || index}
+              item={item}
+              index={index}
+            />
+          ))}
         </div>
 
-        {/* Slider */}
-        <div className="relative">
-          <div
-            ref={sliderRef}
-            className="flex overflow-x-auto space-x-8 pb-8 scrollbar-hide snap-x scroll-smooth"
+        {/* Navigation Buttons */}
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
+          <Button
+            onClick={scrollLeft}
+            className="bg-black/50 hover:bg-black/80 rounded-full p-2 text-white"
+            aria-label="Previous"
           >
-            {movies?.map((item: any, index: any) => (
-              <div key={index} className="flex-none w-[280px] snap-start">
-                <div className="bg-gray-900 group rounded-lg overflow-hidden transition-transform duration-300 cursor-pointer shadow-lg hover:border-gray-600 border-2 border-transparent">
-                  {/* Image */}
-                  <div className="relative h-[330px]">
-                    <Image
-                      src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
-                      alt="Movie poster"
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold rounded-full w-8 h-8 flex items-center justify-center">
-                      {item.vote_average.toFixed(1)}
-                    </div>
-                  </div>
-
-                  {/* Movie Details */}
-                  <div className="p-4">
-                    <h3 className="text-white font-semibold truncate">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      Action, Adventure
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="absolute top-1/2 -left-4 transform -translate-y-1/2 hidden md:block">
-            <Button
-              onClick={scrollLeft}
-              variant="outline"
-              size="icon"
-              className="rounded-full bg-black/50 border-none text-white hover:bg-black/80"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-chevron-left"
-              >
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span className="sr-only">Previous</span>
-            </Button>
-          </div>
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </Button>
+        </div>
 
-          <div className="absolute top-1/2 -right-4 transform -translate-y-1/2 hidden md:block">
-            <Button
-              onClick={scrollRight}
-              variant="outline"
-              size="icon"
-              className="rounded-full bg-black/50 border-none text-white hover:bg-black/80"
+        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
+          <Button
+            onClick={scrollRight}
+            className="bg-black/50 hover:bg-black/80 rounded-full p-2 text-white"
+            aria-label="Next"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-chevron-right"
-              >
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-              <span className="sr-only">Next</span>
-            </Button>
-          </div>
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </Button>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

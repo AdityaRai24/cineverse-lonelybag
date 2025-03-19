@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 
 // Paths that don't require authentication
-const publicPaths = ["/", "/login", "/register", "/home"];
+const publicPaths = ["/", "/login", "/register", "/home","/movie"];
 const authRequiredPaths = ["/profile", "/settings", "/movies", "/tv-shows"];
 
 export function middleware(request: NextRequest) {

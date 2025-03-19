@@ -1,6 +1,7 @@
 "use client";
 
 import { Film, Search, X } from "lucide-react";
+import Link from "next/link";
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 
@@ -47,7 +48,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <Film className="h-8 w-8 text-primary mr-2" />
-          <span className="text-2xl font-bold">CineVerse</span>
+          <Link href={'/home'} className="text-2xl font-bold">CineVerse</Link>
         </div>
 
         <div ref={searchContainerRef} className="relative flex items-center">
