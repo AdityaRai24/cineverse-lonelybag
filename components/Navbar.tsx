@@ -2,7 +2,7 @@
 
 import { Film, Search, X, Heart, User, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import Cookies from "js-cookie";
@@ -17,7 +17,11 @@ const Navbar = () => {
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const [userEmail, setUserEmail] = useState<string>("");
+
+  // Check if we're on the root route
+  const isRootRoute = pathname === "/" || pathname === "./";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -114,107 +118,118 @@ const Navbar = () => {
           <Link
             href="/home"
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold truncate"
-            >
-              CineVerse
-            </Link>
-          </div>
+          >
+            CineVerse
+          </Link>
+        </div>
 
-        {/* Mobile menu button - visible on small screens */}
-        <button
-          className={`
-            ${isMobileMenuOpen ? "hidden" : ""}
-            md:hidden p-2 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white transition-colors z-50`}
-          onClick={toggleMobileMenu}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+        {/* Mobile menu button - visible on small screens but not on root route */}
+        {!isRootRoute && (
+          <button
+            className={`
+              ${isMobileMenuOpen ? "hidden" : ""}
+              md:hidden p-2 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white transition-colors z-50`}
+            onClick={toggleMobileMenu}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
 
-        {/* Desktop navigation - hidden on small screens */}
-        <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-          <div ref={searchContainerRef} className="relative flex items-center">
+        {/* Desktop navigation - hidden on small screens and on root route */}
+        {!isRootRoute && (
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
             <div
-              className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out bg-black/20 rounded-full border border-gray-700 ${
-                isSearchExpanded ? "w-36 lg:w-48 xl:w-64 pl-3 pr-1" : "w-10 p-1"
-              } h-10 lg:h-11`}
+              ref={searchContainerRef}
+              className="relative flex items-center"
             >
-              {!isSearchExpanded ? (
-                <button
-                  onClick={toggleSearch}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
-                  aria-label="Open search"
-                >
-                  <Search className="h-5 w-5" />
-                </button>
-              ) : (
-                <form
-                  onSubmit={handleSearch}
-                  className="flex w-full items-center"
-                >
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search..."
-                    className="bg-transparent border-none outline-none w-full text-sm text-gray-200 placeholder-gray-500 py-1"
-                  />
+              <div
+                className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out bg-black/20 rounded-full border border-gray-700 ${
+                  isSearchExpanded
+                    ? "w-36 lg:w-48 xl:w-64 pl-3 pr-1"
+                    : "w-10 p-1"
+                } h-10 lg:h-11`}
+              >
+                {!isSearchExpanded ? (
                   <button
-                    type="submit"
-                    className="p-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors flex-shrink-0"
-                    aria-label="Search"
-                  >
-                    <Search className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
                     onClick={toggleSearch}
-                    className="p-1.5 ml-1 rounded-full hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 transition-colors flex-shrink-0"
-                    aria-label="Close search"
+                    className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                    aria-label="Open search"
                   >
-                    <X className="h-4 w-4" />
+                    <Search className="h-5 w-5" />
                   </button>
-                </form>
+                ) : (
+                  <form
+                    onSubmit={handleSearch}
+                    className="flex w-full items-center"
+                  >
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Search..."
+                      className="bg-transparent border-none outline-none w-full text-sm text-gray-200 placeholder-gray-500 py-1"
+                    />
+                    <button
+                      type="submit"
+                      className="p-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors flex-shrink-0"
+                      aria-label="Search"
+                    >
+                      <Search className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={toggleSearch}
+                      className="p-1.5 ml-1 rounded-full hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 transition-colors flex-shrink-0"
+                      aria-label="Close search"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+
+            <Link
+              href="/favorites"
+              className="p-2.5 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-500 transition-all"
+              aria-label="Favorites"
+            >
+              <Heart className="h-4 w-4 md:h-5 md:w-5" />
+            </Link>
+
+            <div className="relative" ref={profileDropdownRef}>
+              <button
+                onClick={toggleProfile}
+                className="p-2.5 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white hover:border-white transition-all"
+                aria-label="User profile"
+              >
+                <User className="h-4 w-4 md:h-5 md:w-5" />
+              </button>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900/95 backdrop-blur-sm border border-gray-800 overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-gray-800">
+                    <p className="text-sm text-gray-300 truncate">
+                      {userEmail}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>
+        )}
 
-          <Link
-            href="/favorites"
-            className="p-2.5 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-500 transition-all"
-            aria-label="Favorites"
-          >
-            <Heart className="h-4 w-4 md:h-5 md:w-5" />
-          </Link>
-
-          <div className="relative" ref={profileDropdownRef}>
-            <button
-              onClick={toggleProfile}
-              className="p-2.5 rounded-full bg-black/20 border border-gray-700 text-gray-400 hover:text-white hover:border-white transition-all"
-              aria-label="User profile"
-            >
-              <User className="h-4 w-4 md:h-5 md:w-5" />
-            </button>
-
-            {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900/95 backdrop-blur-sm border border-gray-800 overflow-hidden z-50">
-                <div className="px-4 py-3 border-b border-gray-800">
-                  <p className="text-sm text-gray-300 truncate">{userEmail}</p>
-                </div>
-                <div className="py-1">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile menu - only visible on small screens when menu is open */}
-        {isMobileMenuOpen && (
+        {/* Mobile menu - only visible on small screens when menu is open and not on root route */}
+        {!isRootRoute && isMobileMenuOpen && (
           <div
             ref={mobileMenuRef}
             className="fixed inset-0 bg-black/95 backdrop-blur-sm z-40 md:hidden flex flex-col overflow-y-auto"

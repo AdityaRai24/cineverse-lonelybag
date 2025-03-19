@@ -131,10 +131,6 @@ const MovieCard = ({
           <h3 className="text-white font-semibold text-sm sm:text-base md:text-lg truncate transition-colors duration-300">
             {item.title}
           </h3>
-          <p className="text-gray-400 text-xs sm:text-sm mt-1 truncate">
-            {item.genres?.map((genre: string) => genre).join(", ") ||
-              "Action, Adventure"}
-          </p>
 
           {item.release_date && (
             <p className="text-gray-500 text-xs mt-2">
