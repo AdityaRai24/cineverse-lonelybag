@@ -5,13 +5,10 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, Mail } from "lucide-react";
-import Link from "next/link";
 import toast from "react-hot-toast";
-import Image from "next/image";
 
 interface FormData {
   email: string;

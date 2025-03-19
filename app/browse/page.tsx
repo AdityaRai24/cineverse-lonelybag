@@ -3,7 +3,7 @@ import MovieCard from "@/components/MovieCard";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { redirect, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 
 interface Movie {
   id: number;
@@ -99,7 +99,7 @@ const Page = () => {
       setTotalPages(Math.min(response.data.total_pages, 500));
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching top rated movies:", error);
+      console.error("Error fetching popular movies:", error);
       setLoading(false);
     }
   };
@@ -251,4 +251,13 @@ const Page = () => {
   );
 };
 
-export default Page;
+// Wrap the Page component in a Suspense boundary
+const PageWrapper = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Page />
+    </Suspense>
+  );
+};
+
+export default PageWrapper;

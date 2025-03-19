@@ -1,4 +1,4 @@
-import { Film, Heart } from "lucide-react";
+import { Film } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";

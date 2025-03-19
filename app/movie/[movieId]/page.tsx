@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 // Icons
 import { ChevronLeft, Clock, Star, Calendar, Users, Tag, Film } from "lucide-react";
 import axios from "axios";
-import Navbar from "@/components/Navbar";
 
 interface MovieDetails {
   id: number;
