@@ -43,7 +43,7 @@ const SliderSections = ({
         <h2 className="text-2xl font-bold text-white">{title}</h2>
         <Button
           onClick={() => handleViewAll(title)}
-          className="bg-transparent border border-white text-white hover:bg-transparent hover:text-white"
+          className="bg-red-600 outline-none border  border-transparent hover:border-white text-white hover:bg-transparent hover:text-white"
         >
           View All
         </Button>

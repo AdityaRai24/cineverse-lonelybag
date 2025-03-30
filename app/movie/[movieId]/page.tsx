@@ -420,21 +420,21 @@ export default function MovieDetailPage({
               </div>
 
               {/* Add favorite button */}
-              <Button
-                onClick={toggleFavorite}
-                variant="outline"
-                className="rounded-full px-4 py-2 text-sm border-gray-700 hover:bg-gray-800 flex items-center gap-2"
-              >
-                <Image
-                  src={isFavorite ? "/heart-filled.png" : "/heart.png"}
-                  width={20}
-                  height={20}
-                  alt="Favorite"
-                  className="w-5 h-5"
-                />
-                {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-              </Button>
             </div>
+            <Button
+              onClick={toggleFavorite}
+              variant="outline"
+              className={` rounded-full py-4 mb-4 text-sm border-gray-700 hover:bg-gray-800 flex items-center gap-2`}
+            >
+              <Image
+                src={isFavorite ? "/heart-filled.png" : "/heart.png"}
+                width={20}
+                height={20}
+                alt="Favorite"
+                className={`w-5 h-5`}
+              />
+              {isFavorite ? "Remove From Favorites" : "Add to Favorites"}
+            </Button>
 
             {/* Genres */}
             {movie.genres && movie.genres.length > 0 && (
@@ -584,7 +584,6 @@ export default function MovieDetailPage({
                 </div>
               ))}
             </div>
-
           </div>
         )}
       </div>
